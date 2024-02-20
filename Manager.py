@@ -2,7 +2,6 @@ import random
 import string
 import tkinter as tk
 from tkinter import messagebox
-from tkinter import simpledialog
 
 from Options import Options
 from PasswordStrengthChecker import PasswordStrengthChecker
@@ -53,6 +52,9 @@ class PasswordManager:
         self.button_add.config(font=("Arial", text_size), fg=text_color, bg=bg_color)
         self.button_get_all.config(font=("Arial", text_size), fg=text_color, bg=bg_color)
         self.button_options.config(font=("Arial", text_size), fg=text_color, bg=bg_color)
+        self.options.background_color = bg_color
+        self.options.text_color = text_color
+        self.options.text_size_scale = text_size
         self.frame.config(bg=bg_color)
 
     def login_window(self):
@@ -134,16 +136,40 @@ class PasswordManager:
             messagebox.showerror("Error", "Please fill in all fields.")
 
     def generate_password(self):
-        length = simpledialog.askinteger("Password Length", "Enter password length:", initialvalue=12)
-        if length:
-            password = generate_random_password(length)
-            self.entry_password.delete(0, tk.END)
-            self.entry_password.insert(0, password)
-        return
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Password Length")
+        dialog.configure(bg=self.options.background_color)
+        print(self.options.background_color)
+        label = tk.Label(dialog, text="Enter password length:", fg=self.options.text_color,
+                         bg=self.options.background_color)
+        label.pack()
+
+        entry = tk.Entry(dialog, fg=self.options.text_color, bg=self.options.background_color)
+        entry.pack()
+
+        def ok_button_click():
+            length = entry.get()
+
+            if length.isdigit():
+                if int(length) <= 0 or int(length) > 20:
+                    messagebox.showerror("Error", "Between 1 and 20")
+                    return
+                password = generate_random_password(int(length))
+                self.entry_password.delete(0, tk.END)
+                self.entry_password.insert(0, password)
+                dialog.destroy()
+
+        ok_button = tk.Button(dialog, text="OK", command=ok_button_click, fg=self.options.text_color,
+                              bg=self.options.background_color)
+        ok_button.pack()
+
+        entry.focus_set()
+
+        dialog.grab_set()
+        self.root.wait_window(dialog)
 
     def get_passwords(self):
         lines = self.safe.get_passwords()
-
         passwords_window = tk.Toplevel(self.root, bg=self.options.background_color)
         passwords_window.title("All Passwords")
 
@@ -160,14 +186,14 @@ class PasswordManager:
                 servico, name, password = linha.split(":")
                 plain_password = self.safe.decrypt(password)
                 if filter_text in servico.lower():
-                    tk.Label(passwords_frame,
+                    tk.Label(passwords_frame,bg=self.options.background_color,
                              text=f"Service: {servico}, Username: {name}, Password: {plain_password}").pack(
-                        anchor="w", bg=self.options.background_color)
+                        anchor="w")
 
         tk.Button(passwords_window, text="Filter", command=filter_passwords, bg=self.options.background_color).grid(
             row=0, column=2)
 
-        passwords_frame = tk.Frame(passwords_window)
+        passwords_frame = tk.Frame(passwords_window, bg=self.options.background_color)
         passwords_frame.grid(row=1, column=0, columnspan=3)
 
         for i, line in enumerate(lines, start=1):

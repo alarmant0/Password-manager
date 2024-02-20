@@ -54,7 +54,7 @@ class Options:
         tk.Label(self.options_window, text="Adjust Text Size:", fg=self.text_color,
                  bg=self.background_color).pack()
 
-        self.text_size_scale = tk.Scale(self.options_window, from_=8, to=20, orient="horizontal",fg=self.text_color,
+        self.text_size_scale = tk.Scale(self.options_window, from_=8, to=20, orient="horizontal", fg=self.text_color,
                                         bg=self.background_color)
         self.text_size_scale.pack()
 
@@ -69,7 +69,8 @@ class Options:
         bg_color_button.pack()
 
         apply_button = tk.Button(self.options_window, text="Apply", pady=5,
-                                 command=lambda: self.apply_changes(self.text_size_scale.get()))
+                                 command=lambda: self.apply_changes(self.text_size_scale.get()),
+                                 bg=self.background_color)
         apply_button.pack()
 
     def choose_text_color(self):
@@ -114,4 +115,4 @@ class Options:
         for child in widget.winfo_children():
             self.change_widget_bg_color(child, color)
 
-#David Pinheiro
+# David Pinheiro
