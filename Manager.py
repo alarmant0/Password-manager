@@ -186,7 +186,7 @@ class PasswordManager:
                 servico, name, password = linha.split(":")
                 plain_password = self.safe.decrypt(password)
                 if filter_text in servico.lower():
-                    tk.Label(passwords_frame,bg=self.options.background_color,
+                    tk.Label(passwords_frame, bg=self.options.background_color,
                              text=f"Service: {servico}, Username: {name}, Password: {plain_password}").pack(
                         anchor="w")
 
