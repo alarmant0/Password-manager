@@ -113,3 +113,5 @@ class Options:
         widget.config(bg=color)
         for child in widget.winfo_children():
             self.change_widget_bg_color(child, color)
+
+#David Pinheiro

@@ -188,3 +188,5 @@ class PasswordManager:
 if __name__ == "__main__":
     password_manager = PasswordManager()
     password_manager.run()
+
+#David Pinheiro

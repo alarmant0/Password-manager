@@ -18,3 +18,5 @@ class PasswordStrengthChecker:
             return "yellow"
         else:
             return "red"
+
+#David Pinheiro
