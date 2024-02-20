@@ -45,4 +45,4 @@ class Safe:
         decrypted_password = cipher.decrypt(encrypted_password.encode()).decode()
         return decrypted_password
 
-#David Pinheiro
+# David Pinheiro

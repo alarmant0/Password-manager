@@ -164,7 +164,8 @@ class PasswordManager:
                              text=f"Service: {servico}, Username: {name}, Password: {plain_password}").pack(
                         anchor="w", bg=self.options.background_color)
 
-        tk.Button(passwords_window, text="Filter", command=filter_passwords, bg=self.options.background_color).grid(row=0, column=2)
+        tk.Button(passwords_window, text="Filter", command=filter_passwords, bg=self.options.background_color).grid(
+            row=0, column=2)
 
         passwords_frame = tk.Frame(passwords_window)
         passwords_frame.grid(row=1, column=0, columnspan=3)
@@ -189,4 +190,4 @@ if __name__ == "__main__":
     password_manager = PasswordManager()
     password_manager.run()
 
-#David Pinheiro
+# David Pinheiro
