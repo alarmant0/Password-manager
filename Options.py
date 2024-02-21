@@ -111,6 +111,8 @@ class Options:
         self.options_window.destroy()
 
     def change_widget_bg_color(self, widget, color):
+        if widget.winfo_name() == "strength":
+            return
         widget.config(bg=color)
         for child in widget.winfo_children():
             self.change_widget_bg_color(child, color)

@@ -80,7 +80,6 @@ class PasswordManager:
             self.initialize_main_app()
 
     def initialize_main_app(self):
-
         self.frame = tk.Frame(self.root)
         self.frame.pack(padx=10, pady=10)
 
@@ -94,7 +93,6 @@ class PasswordManager:
 
         self.label_username = tk.Label(self.frame, text="Username:", fg=self.options.text_color,
                                        bg=self.options.background_color)
-
         self.label_username.grid(row=1, column=0, sticky="w")
         self.entry_username = tk.Entry(self.frame)
         self.entry_username.grid(row=1, column=1)
@@ -106,26 +104,28 @@ class PasswordManager:
         self.entry_password = tk.Entry(self.frame, textvariable=self.password_var)
         self.entry_password.grid(row=2, column=1)
 
-        self.strength_bar = tk.Label(self.frame, text="", bg="grey", width=20)
-        self.strength_bar.grid(row=3, column=0, columnspan=2, pady=5)
+        self.strength_bar = tk.Label(self.frame, text="", name="strength", width=17, height=1)
+        self.strength_bar.grid(row=3, column=1)
+
+        self.entry_password.bind("<KeyRelease>", lambda event: self.update_strength_bar())
 
         self.button_generate = tk.Button(self.frame, text="Generate Password", command=self.generate_password)
-        self.button_generate.grid(row=2, column=2, padx=10)
+        self.button_generate.grid(row=3, column=5, padx=10)
 
         self.button_add = tk.Button(self.frame, text="Add Password", command=self.add_password)
-        self.button_add.grid(row=4, column=0, columnspan=2, pady=5)
+        self.button_add.grid(row=3, column=0, columnspan=2, pady=5)
 
         self.button_get_all = tk.Button(self.frame, text="Retrieve All Passwords", command=self.get_passwords)
-        self.button_get_all.grid(row=5, column=0, columnspan=2)
+        self.button_get_all.grid(row=4, column=0, columnspan=2)
 
         self.button_options = tk.Button(self.frame, text="Options", command=self.open_options_window)
-        self.button_options.grid(row=6, column=0, columnspan=2, pady=5)
+        self.button_options.grid(row=5, column=0, columnspan=2, pady=5)
+
         self.options.load_file()
 
     def update_strength_bar(self):
-        password = self.password_var.get()
+        password = self.entry_password.get()
         strength = PasswordStrengthChecker.check_strength(password)
-
         self.strength_bar.config(bg=strength)
 
     def add_password(self):
