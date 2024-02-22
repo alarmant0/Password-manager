@@ -6,15 +6,20 @@ from tkinter import colorchooser
 class Options:
     def __init__(self, app, update_ui_callback):
         self.text_size_scale = None
+
         self.text_color = None
         self.background_color = None
         self.text_size = None
+
         self.app = app
         self.options_window = None
         self.update_ui_callback = update_ui_callback
         self.config_file = os.path.join(os.getenv('APPDATA'), 'password_manager', 'options.conf')
 
     def save_config(self, text_size, text_color, bg_color):
+        self.text_size = text_size
+        self.text_color = text_color
+        self.background_color = bg_color
         with open(self.config_file, "w") as f:
             f.write(f"TextSize={text_size}\n")
             f.write(f"TextColor={text_color}\n")
@@ -29,7 +34,7 @@ class Options:
                     for line in f:
                         key, value = line.strip().split("=")
                         if key == "TextSize" and len(value) != 0 and value[0] != ".":
-                            self.text_size_scale = value
+                            self.text_size = value
                             self.app.root.option_add("*Font", f"Arial {value}")
                         elif key == "TextColor" and len(value) != 0:
                             self.text_color = value
@@ -43,7 +48,7 @@ class Options:
                     self.options_window.config(bg=self.background_color)
                     self.change_widget_bg_color(self.options_window, self.background_color)
                     self.change_widget_text_color(self.options_window, self.text_color)
-                    self.text_size_scale.set(self.text_size_scale)
+                    self.text_size_scale.set(self.text_size)
 
             except FileNotFoundError:
                 print("No options configuration file found. Using default settings.")
@@ -58,6 +63,7 @@ class Options:
         self.text_size_scale = tk.Scale(self.options_window, from_=8, to=20, orient="horizontal", fg=self.text_color,
                                         bg=self.background_color)
         self.text_size_scale.pack()
+        self.text_size_scale.set(self.text_size)
 
         text_color_button = tk.Button(self.options_window, text="Choose Text Color", pady=5,
                                       command=self.choose_text_color, fg=self.text_color,
@@ -77,46 +83,49 @@ class Options:
     def choose_text_color(self):
         color = colorchooser.askcolor()[1]
         if color:
-            self.change_widget_text_color(self.options_window, color)
-            self.change_widget_text_color(self.app.root, color)
-            self.save_config(self.text_size_scale.get(), color, self.app.root.cget('bg'))
-            text_color = self.app.root.option_get('foreground', 'Label')
-            bg_color = self.app.root.cget('bg')
-            self.save_config(self.text_size, text_color, bg_color)
-            self.update_ui_callback(self.text_size, text_color, bg_color)
-            self.options_window.destroy()
+            self.text_color = color
+
+    def choose_bg_color(self):
+        color = colorchooser.askcolor()[1]
+        if color:
+            self.background_color = color
+
+    def apply_changes(self):
+        self.app.root.option_get('foreground', 'Label')
+        self.app.root.cget('bg')
+
+        self.text_size = self.text_size_scale.get()
+        self.text_size_scale.set(self.text_size)
+        self.change_widget_text_size(self.app.root, self.text_size)
+        self.change_widget_text_size(self.options_window, self.text_size)
+
+        self.options_window.config(bg=self.background_color)
+        self.app.root.config(bg=self.background_color)
+        self.change_widget_bg_color(self.app.root, self.background_color)
+
+        self.change_widget_text_color(self.options_window, self.text_color)
+        self.change_widget_text_color(self.app.root, self.text_color)
+
+        self.save_config(self.text_size, self.text_color, self.background_color)
+        self.update_ui_callback(self.text_size, self.text_color, self.background_color)
+
+        self.options_window.destroy()
+
+    def change_widget_text_size(self, widget, size):
+        widget.option_add("*Font", f"Arial {size}")
+        for child in widget.winfo_children():
+            self.change_widget_text_size(child, size)
+
+    def change_widget_bg_color(self, widget, color):
+        if widget.winfo_name() == "strength" or widget.winfo_name == "icon":
+            return
+        widget.config(bg=color)
+        for child in widget.winfo_children():
+            self.change_widget_bg_color(child, color)
 
     def change_widget_text_color(self, widget, color):
         widget.option_add("*foreground", color)
         for child in widget.winfo_children():
             self.change_widget_text_color(child, color)
-
-    def choose_bg_color(self):
-        color = colorchooser.askcolor()[1]
-        if color:
-            self.options_window.config(bg=color)
-            self.app.root.config(bg=color)
-            self.change_widget_bg_color(self.app.root, color)
-            text_color = self.app.root.option_get('foreground', 'Label')
-            bg_color = self.app.root.cget('bg')
-            self.save_config(self.text_size_scale.get(), text_color, bg_color)
-            self.update_ui_callback(self.text_size, text_color, bg_color)
-            self.options_window.destroy()
-
-    def apply_changes(self):
-        text_color = self.app.root.option_get('foreground', 'Label')
-        bg_color = self.app.root.cget('bg')
-        self.text_size = self.text_size_scale.get()
-        self.app.root.option_add("*Font", f"Arial {self.text_size_scale.get()}")
-        self.save_config(self.text_size_scale.get(), text_color, bg_color)
-        self.update_ui_callback(self.text_size_scale.get(), text_color, bg_color)
-        self.options_window.destroy()
-
-    def change_widget_bg_color(self, widget, color):
-        if widget.winfo_name() == "strength":
-            return
-        widget.config(bg=color)
-        for child in widget.winfo_children():
-            self.change_widget_bg_color(child, color)
 
 # David Pinheiro
