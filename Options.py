@@ -5,6 +5,7 @@ from tkinter import colorchooser
 
 class Options:
     def __init__(self, app, update_ui_callback):
+        self.selected_cryptography = None
         self.text_size_scale = None
 
         self.text_color = None
@@ -79,6 +80,16 @@ class Options:
                                  command=lambda: self.apply_changes(),
                                  bg=self.background_color)
         apply_button.pack()
+
+        cryptography_label = tk.Label(self.options_window, text="Select Cryptography Type:", fg=self.text_color,
+                                      bg=self.background_color)
+        cryptography_label.pack()
+        cryptography_options = ["AES", "RSA", "DES", "Blowfish", "Twofish"]
+        self.selected_cryptography = tk.StringVar(self.options_window)
+        self.selected_cryptography.set(cryptography_options[0])
+        cryptography_dropdown = tk.OptionMenu(self.options_window, self.selected_cryptography, *cryptography_options)
+        cryptography_dropdown.config(fg=self.text_color, bg=self.background_color)
+        cryptography_dropdown.pack()
 
     def choose_text_color(self):
         color = colorchooser.askcolor()[1]

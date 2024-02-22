@@ -5,8 +5,7 @@ import requests
 class PasswordStrengthChecker:
     @staticmethod
     def check_strength(password):
-        PasswordStrengthChecker.has_consecutive_characters(password)
-        if len(password) < 8 or PasswordStrengthChecker.has_consecutive_characters(password):
+        if len(password) < 8:
             return "red"
 
         has_uppercase = bool(re.search(r'[A-Z]', password))

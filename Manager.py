@@ -16,6 +16,9 @@ def generate_random_password(length):
 
 class PasswordManager:
     def __init__(self):
+        self.edit_menu = None
+        self.help_menu = None
+        self.menu_bar = None
         self.button_generate = None
         self.button_options = None
         self.password_var = None
@@ -44,17 +47,22 @@ class PasswordManager:
     def update_ui(self, text_size, text_color, bg_color):
         self.label_service.config(font=("Arial", text_size), fg=text_color)
         self.entry_service.config(font=("Arial", text_size), fg=text_color)
+
         self.label_username.config(font=("Arial", text_size), fg=text_color)
         self.entry_username.config(font=("Arial", text_size), fg=text_color)
+
         self.label_password.config(font=("Arial", text_size), fg=text_color)
         self.entry_password.config(font=("Arial", text_size), fg=text_color)
+
         self.button_generate.config(font=("Arial", text_size), fg=text_color, bg=bg_color)
         self.button_add.config(font=("Arial", text_size), fg=text_color, bg=bg_color)
         self.button_get_all.config(font=("Arial", text_size), fg=text_color, bg=bg_color)
         self.button_options.config(font=("Arial", text_size), fg=text_color, bg=bg_color)
+
         self.options.background_color = bg_color
         self.options.text_color = text_color
         self.options.text_size_scale = text_size
+
         self.frame.config(bg=bg_color)
 
     def login_window(self):
@@ -62,19 +70,24 @@ class PasswordManager:
 
         self.login_frame = tk.Frame(self.root, bg=self.options.background_color)
         self.login_frame.pack(padx=10, pady=10)
+
         self.label_password = tk.Label(self.login_frame, text="Enter Password:", fg=self.options.text_color,
                                        bg=self.options.background_color)
+
         self.label_password.grid(row=0, column=0, sticky="w")
         self.entry_password = tk.Entry(self.login_frame, show="*", fg=self.options.text_color,
                                        bg=self.options.background_color)
+
         self.entry_password.grid(row=0, column=1)
         self.entry_password.bind("<Return>", lambda event: self.login())
+
         self.button_login = tk.Button(self.login_frame, text="Login", command=self.login, fg=self.options.text_color,
                                       bg=self.options.background_color)
         self.button_login.grid(row=1, column=0, columnspan=2, pady=5)
 
     def login(self):
         password = self.entry_password.get()
+        # hashlib thing
         if password == "123":
             self.login_frame.destroy()
             self.initialize_main_app()
@@ -84,6 +97,25 @@ class PasswordManager:
         self.frame.pack(padx=10, pady=10)
 
         self.options.load_file()
+        self.menu_bar = tk.Menu(self.root)
+
+        # Create File menu
+        self.file_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.file_menu.add_command(label="Exit", command=self.root.quit)
+        self.menu_bar.add_cascade(label="File", menu=self.file_menu)
+
+        # Create Edit menu
+        self.edit_menu = tk.Menu(self.menu_bar, tearoff=0)
+        # Add edit options here if needed
+        self.menu_bar.add_cascade(label="Edit", menu=self.edit_menu)
+
+        # Create Help menu
+        self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.help_menu.add_command(label="About")
+        self.menu_bar.add_cascade(label="Help", menu=self.help_menu)
+
+        # Attach the menu bar to the root window
+        self.root.config(menu=self.menu_bar)
 
         self.label_service = tk.Label(self.frame, text="Service:", fg=self.options.text_color,
                                       bg=self.options.background_color)
@@ -104,13 +136,13 @@ class PasswordManager:
         self.entry_password = tk.Entry(self.frame, textvariable=self.password_var)
         self.entry_password.grid(row=2, column=1)
 
-        self.strength_bar = tk.Label(self.frame, text="", name="strength", width=17, height=1)
-        self.strength_bar.grid(row=3, column=1)
+        self.strength_bar = tk.Label(self.frame, text=" ", name="strength", width=17, height=1)
+        self.strength_bar.grid(row=2, column=5)
 
         self.entry_password.bind("<KeyRelease>", lambda event: self.update_strength_bar())
 
         self.button_generate = tk.Button(self.frame, text="Generate Password", command=self.generate_password)
-        self.button_generate.grid(row=3, column=5, padx=10)
+        self.button_generate.grid(row=4, column=5, padx=10)
 
         self.button_add = tk.Button(self.frame, text="Add Password", command=self.add_password)
         self.button_add.grid(row=3, column=0, columnspan=2, pady=5)
@@ -139,11 +171,9 @@ class PasswordManager:
         dialog = tk.Toplevel(self.root)
         dialog.title("Password Length")
         dialog.configure(bg=self.options.background_color)
-        print(self.options.background_color)
         label = tk.Label(dialog, text="Enter password length:", fg=self.options.text_color,
                          bg=self.options.background_color)
         label.pack()
-
         entry = tk.Entry(dialog, fg=self.options.text_color, bg=self.options.background_color)
         entry.pack()
 
@@ -158,6 +188,7 @@ class PasswordManager:
                 self.entry_password.delete(0, tk.END)
                 self.entry_password.insert(0, password)
                 dialog.destroy()
+                self.update_strength_bar()
 
         ok_button = tk.Button(dialog, text="OK", command=ok_button_click, fg=self.options.text_color,
                               bg=self.options.background_color)
