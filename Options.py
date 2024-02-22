@@ -8,6 +8,7 @@ class Options:
         self.text_size_scale = None
         self.text_color = None
         self.background_color = None
+        self.text_size = None
         self.app = app
         self.options_window = None
         self.update_ui_callback = update_ui_callback
@@ -27,7 +28,7 @@ class Options:
                 with open(self.config_file, "r") as f:
                     for line in f:
                         key, value = line.strip().split("=")
-                        if key == "TextSize" and len(value) != 0:
+                        if key == "TextSize" and len(value) != 0 and value[0] != ".":
                             self.text_size_scale = value
                             self.app.root.option_add("*Font", f"Arial {value}")
                         elif key == "TextColor" and len(value) != 0:
@@ -69,7 +70,7 @@ class Options:
         bg_color_button.pack()
 
         apply_button = tk.Button(self.options_window, text="Apply", pady=5,
-                                 command=lambda: self.apply_changes(self.text_size_scale.get()),
+                                 command=lambda: self.apply_changes(),
                                  bg=self.background_color)
         apply_button.pack()
 
@@ -81,8 +82,8 @@ class Options:
             self.save_config(self.text_size_scale.get(), color, self.app.root.cget('bg'))
             text_color = self.app.root.option_get('foreground', 'Label')
             bg_color = self.app.root.cget('bg')
-            self.save_config(self.text_size_scale.get(), text_color, bg_color)
-            self.update_ui_callback(self.text_size_scale.get(), text_color, bg_color)
+            self.save_config(self.text_size, text_color, bg_color)
+            self.update_ui_callback(self.text_size, text_color, bg_color)
             self.options_window.destroy()
 
     def change_widget_text_color(self, widget, color):
@@ -99,15 +100,16 @@ class Options:
             text_color = self.app.root.option_get('foreground', 'Label')
             bg_color = self.app.root.cget('bg')
             self.save_config(self.text_size_scale.get(), text_color, bg_color)
-            self.update_ui_callback(self.text_size_scale.get(), text_color, bg_color)
+            self.update_ui_callback(self.text_size, text_color, bg_color)
             self.options_window.destroy()
 
-    def apply_changes(self, text_size):
+    def apply_changes(self):
         text_color = self.app.root.option_get('foreground', 'Label')
         bg_color = self.app.root.cget('bg')
-        self.app.root.option_add("*Font", f"Arial {text_size}")
-        self.save_config(text_size, text_color, bg_color)
-        self.update_ui_callback(text_size, text_color, bg_color)
+        self.text_size = self.text_size_scale.get()
+        self.app.root.option_add("*Font", f"Arial {self.text_size_scale.get()}")
+        self.save_config(self.text_size_scale.get(), text_color, bg_color)
+        self.update_ui_callback(self.text_size_scale.get(), text_color, bg_color)
         self.options_window.destroy()
 
     def change_widget_bg_color(self, widget, color):
