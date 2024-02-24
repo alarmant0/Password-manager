@@ -31,6 +31,7 @@ class Safe:
         encrypted_password = cipher.encrypt(password.encode()).decode()
         with open(self.PASSWORDS_FILE, 'a') as f:
             f.write(f'{service}:{username}:{encrypted_password}\n')
+        f.close()
 
     def get_passwords(self):
         if os.path.exists(self.PASSWORDS_FILE):
@@ -44,5 +45,17 @@ class Safe:
         cipher = Fernet(self.key)
         decrypted_password = cipher.decrypt(encrypted_password.encode()).decode()
         return decrypted_password
+
+    def delete_pass(self, service, username):
+        with open(self.PASSWORDS_FILE, "r") as file:
+            lines = file.readlines()
+
+        with open(self.PASSWORDS_FILE, "w") as file:
+            for line in lines:
+                elements = line.strip().split(":")
+                if len(elements) == 3:
+                    existing_service, existing_username, _ = elements
+                    if existing_service != service or existing_username != username:
+                        file.write(line)
 
 # David Pinheiro

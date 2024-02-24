@@ -123,6 +123,7 @@ class Options:
         self.options_window.destroy()
 
     def change_widget_text_size(self, widget, size):
+        print(widget.winfo_name())
         widget.option_add("*Font", f"Arial {size}")
         for child in widget.winfo_children():
             self.change_widget_text_size(child, size)
