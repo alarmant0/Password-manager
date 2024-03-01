@@ -138,8 +138,8 @@ class PasswordManager:
         self.root.config(menu=self.menu_bar)
 
         self.label_service = tk.Label(self.frame, text="Service:",
-                                      fg=self.options.text_color, bg=self.options.background_color
-                                      , name="label_service")
+                                      fg=self.options.text_color,
+                                      bg=self.options.background_color, name="label_service")
         self.label_service.grid(row=0, column=0, sticky="w")
         self.entry_service = tk.Entry(self.frame, name="entry_service")
         self.entry_service.grid(row=0, column=1)
@@ -160,8 +160,8 @@ class PasswordManager:
         self.entry_username.bind("<Return>", lambda event: self.add_password())
 
         self.label_password = tk.Label(self.frame, text="Password:",
-                                       fg=self.options.text_color, bg=self.options.background_color
-                                       , name="label_password")
+                                       fg=self.options.text_color,
+                                       bg=self.options.background_color, name="label_password")
         self.label_password.grid(row=2, column=0, sticky="w")
 
         self.entry_password = tk.Entry(self.frame, textvariable=self.password_var, name="entry_password")
@@ -247,22 +247,17 @@ class PasswordManager:
         self.passwords_window = tk.Toplevel(self.root, bg=self.options.background_color)
         self.passwords_window.title("All Passwords")
 
-        filter_var = tk.StringVar()
-        tk.Label(self.passwords_window, text="Filter by Service:", bg=self.options.background_color).grid(row=0, column=0)
+        filter_var = tk.StringVar(name="data")
+        tk.Label(self.passwords_window, text="Filter by Service:", bg=self.options.background_color).grid(row=0,
+                                                                                                          column=0)
         filter_entry = tk.Entry(self.passwords_window, textvariable=filter_var, bg=self.options.background_color)
         filter_entry.grid(row=0, column=1)
 
         def delete_password(service, username):
             self.safe.delete_pass(service, username)
-            filter_passwords()
             for widget in self.passwords_window.winfo_children():
-                print(widget.cget("text"))
-                self.passwords_window.winfo_children.destroy()
-                widget.grid_forget()
-                widget.destroy()
-
-                filter_passwords()
-                break
+                if f"button:{service}" == widget.winfo_name() or f"label:{service}" == widget.winfo_name():
+                    widget.destroy()
 
         def filter_passwords():
             filter_text = filter_var.get().lower()
@@ -279,16 +274,19 @@ class PasswordManager:
                     if filter_text in service.lower():
                         tk.Label(self.passwords_window,
                                  text=f"Service: {service}, Username: {username}, Password: {plain_password}",
-                                 bg=self.options.background_color).grid(row=row, column=0, columnspan=2)
+                                 bg=self.options.background_color,
+                                 name=f"label:{service}").grid(row=row, column=0, columnspan=2)
                         tk.Button(self.passwords_window, text="Delete",
-                                  command=lambda s=service, u=username: delete_password(s, u)).grid(row=row, column=2)
+                                  command=lambda s=service,
+                                  u=username: delete_password(s, u),
+                                  name=f"button:{service}").grid(row=row, column=2)
                         row += 1
                         passwords_displayed += 1
 
         filter_passwords()
 
-        tk.Button(self.passwords_window, text="Filter", command=filter_passwords, bg=self.options.background_color).grid(
-            row=0, column=2)
+        tk.Button(self.passwords_window, text="Filter", command=filter_passwords,
+                  bg=self.options.background_color).grid(row=0, column=2)
 
         filter_entry.bind("<Return>", lambda event: filter_passwords())
 
