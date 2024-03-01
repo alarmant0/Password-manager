@@ -199,6 +199,10 @@ class PasswordManager:
         service = self.entry_service.get()
         username = self.entry_username.get()
         password = self.entry_password.get()
+        services = self.read_services_from_file()
+        if service in services:
+            messagebox.showinfo("Double service", "You already have this service!")
+            return
         if len(service) == 0 or len(username) == 0 or len(password) == 0:
             messagebox.showerror("Error", "Please fill in all fields.")
         else:
@@ -207,6 +211,17 @@ class PasswordManager:
             self.entry_username.delete(0, tk.END)
             self.entry_password.delete(0, tk.END)
             self.update_strength_bar()
+
+    def read_services_from_file(self):
+        services = []
+        try:
+            with open(self.safe.PASSWORDS_FILE, 'r') as file:
+                for line in file:
+                    service = line.strip().split(':')[0]
+                    services.append(service)
+        except FileNotFoundError:
+            messagebox.showerror("Error", "File not found.")
+        return services
 
     def generate_password(self):
         dialog = tk.Toplevel(self.root)
